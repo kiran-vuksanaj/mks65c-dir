@@ -6,6 +6,8 @@
 #include<sys/stat.h>
 #include<sys/types.h>
 
+#include<time.h>
+
 void smodef(char *buf, mode_t mode) {
   // printf("[mode octal: %o]\n",mode);
   short b = 0400; // the first byte to be considered is 0400, you can right shift until you've examined every bite
@@ -22,4 +24,16 @@ void smodef(char *buf, mode_t mode) {
     b = b >> 1;
   }
   buf[i] = '\0';
+}
+void print_fstat(char *filepath) {
+  struct stat statbuf;
+  int status;
+  status = stat(filepath,&statbuf);
+  if(status < 0) {
+    printf("Error %d while statting file: %s\n",errno,strerror(errno));
+    return;
+  }
+  char mode[10];
+  smodef(mode,statbuf.st_mode);
+  printf("%s [%s] %ld B\t%s",mode,filepath,statbuf.st_size,ctime(&statbuf.st_atim.tv_sec));
 }

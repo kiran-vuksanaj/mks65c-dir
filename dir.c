@@ -7,6 +7,8 @@
 #include<sys/types.h>
 #include<dirent.h>
 
+#include"pstat.h"
+
 int main() {
   int status;
   DIR *cwd = opendir(".");
@@ -30,7 +32,7 @@ int main() {
 	printf("Error while statting [%s]: [%d] - %s",dirfile->d_name,errno,strerror(errno));
 	break;
       }
-      printf("%9o [%s] (%ld bytes)\n",statbuf.st_mode,dirfile->d_name,statbuf.st_size);
+      print_fstat(dirfile->d_name);
       break;
     default:
       printf("is something else\n");

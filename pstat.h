@@ -3,6 +3,6 @@
 
 void smodef(char *buf, mode_t mode);
 
-void print_fstat(char *path);
+void print_fstat(char *filepath);
 
 #endif
