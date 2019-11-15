@@ -14,7 +14,6 @@ off_t ls(char *path);
 int main() {
   char pathbuf[512] = ".";
   off_t out = ls(pathbuf);
-  printf("total: %ld B\n",out);
 }
 
 off_t ls(char *path) {
@@ -24,7 +23,7 @@ off_t ls(char *path) {
   strcat(path,"/");
   printf("directory [%s]\n",path);
   if(!cwd) {
-    printf("Error while opening .: [%d] - %s\n",errno,strerror(errno));
+    printf("Error while opening [%s]: [%d] - %s\n",path,errno,strerror(errno));
     return -1;
   }
   // printf("const DT_DIR: %hhd\n",DT_DIR);
@@ -37,7 +36,8 @@ off_t ls(char *path) {
       // printf("directory [%s]/\n",path);
       if(dirfile->d_name[0] != '.'){
 	strcat(path,dirfile->d_name);
-	ls(path);
+	total += ls(path);
+	*(strrchr(path,'/')+1) = '\0';
       }else {
 	printf("directory [%s%s] (ignored for recursion)\n",path,dirfile->d_name);
       }
@@ -53,6 +53,7 @@ off_t ls(char *path) {
     }
     dirfile = readdir(cwd);
   }
+  printf("dir total [%s]: %ld B\n",path,total);
   *(strrchr(path,'/')) = '\0';
   return total;
 }
