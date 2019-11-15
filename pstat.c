@@ -30,7 +30,7 @@ off_t print_fstat(char *filepath) {
   int status;
   status = stat(filepath,&statbuf);
   if(status < 0) {
-    printf("Error %d while statting file: %s\n",errno,strerror(errno));
+    printf("Error %d while statting file [%s]: %s\n",errno,filepath,strerror(errno));
     return 0;
   }
   char mode[10];

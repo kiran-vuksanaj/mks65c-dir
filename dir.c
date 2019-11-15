@@ -9,9 +9,11 @@
 #include"pstat.h"
 
 off_t ls(char *path);
+// NOTE: i'm assuming that path points to an allocation that has! enough! space! for all pathnames
 
 int main() {
-  off_t out = ls(".");
+  char pathbuf[512] = ".";
+  off_t out = ls(pathbuf);
   printf("total: %ld B\n",out);
 }
 
@@ -19,6 +21,8 @@ off_t ls(char *path) {
   int status;
   DIR *cwd = opendir(path);
   off_t total = 0;
+  strcat(path,"/");
+  printf("directory [%s]\n",path);
   if(!cwd) {
     printf("Error while opening .: [%d] - %s\n",errno,strerror(errno));
     return -1;
@@ -30,10 +34,16 @@ off_t ls(char *path) {
     // printf("file of type %hhd\n",dirfile->d_type);
     switch(dirfile->d_type) {
     case DT_DIR:
-      printf("directory [%s]/\n",dirfile->d_name);
+      // printf("directory [%s]/\n",path);
+      if(dirfile->d_name[0] != '.'){
+	strcat(path,dirfile->d_name);
+	ls(path);
+      }
       break;
     case DT_REG:
-      total += print_fstat(dirfile->d_name);
+      strcat(path,dirfile->d_name);
+      total += print_fstat(path);
+      *(strrchr(path,'/')+1) = '\0';
       break;
     default:
       printf("is something else\n");
@@ -41,5 +51,6 @@ off_t ls(char *path) {
     }
     dirfile = readdir(cwd);
   }
+  *(strrchr(path,'/')) = '\0';
   return total;
 }
