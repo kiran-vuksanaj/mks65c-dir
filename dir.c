@@ -38,6 +38,8 @@ off_t ls(char *path) {
       if(dirfile->d_name[0] != '.'){
 	strcat(path,dirfile->d_name);
 	ls(path);
+      }else {
+	printf("directory [%s%s] (ignored for recursion)\n",path,dirfile->d_name);
       }
       break;
     case DT_REG:
