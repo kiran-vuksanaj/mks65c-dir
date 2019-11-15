@@ -25,15 +25,16 @@ void smodef(char *buf, mode_t mode) {
   }
   buf[i] = '\0';
 }
-void print_fstat(char *filepath) {
+off_t print_fstat(char *filepath) {
   struct stat statbuf;
   int status;
   status = stat(filepath,&statbuf);
   if(status < 0) {
     printf("Error %d while statting file: %s\n",errno,strerror(errno));
-    return;
+    return 0;
   }
   char mode[10];
   smodef(mode,statbuf.st_mode);
   printf("%s [%s] %ld B\t%s",mode,filepath,statbuf.st_size,ctime(&statbuf.st_atim.tv_sec));
+  return statbuf.st_size;
 }

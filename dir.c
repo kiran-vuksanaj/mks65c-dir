@@ -9,12 +9,20 @@
 
 #include"pstat.h"
 
+off_t ls(char *path);
+
 int main() {
+  off_t out = ls(".");
+  printf("total: %ld B\n",out);
+}
+
+off_t ls(char *path) {
   int status;
-  DIR *cwd = opendir(".");
+  DIR *cwd = opendir(path);
+  off_t total = 0;
   if(!cwd) {
     printf("Error while opening .: [%d] - %s\n",errno,strerror(errno));
-    return 1;
+    return -1;
   }
   // printf("const DT_DIR: %hhd\n",DT_DIR);
   // printf("const DT_REG: %hhd\n",DT_REG);
@@ -32,7 +40,7 @@ int main() {
 	printf("Error while statting [%s]: [%d] - %s",dirfile->d_name,errno,strerror(errno));
 	break;
       }
-      print_fstat(dirfile->d_name);
+      total += print_fstat(dirfile->d_name);
       break;
     default:
       printf("is something else\n");
@@ -40,5 +48,5 @@ int main() {
     }
     dirfile = readdir(cwd);
   }
-  return 0;
+  return total;
 }
