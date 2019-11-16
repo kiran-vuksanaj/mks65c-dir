@@ -9,12 +9,21 @@
 #include"pstat.h"
 
 off_t ls(char *path);
+short should_ignore_path(char *name);
 // NOTE: i'm assuming that path points to an allocation that has! enough! space! for all pathnames
 
 int main() {
   char pathbuf[512] = ".";
   off_t out = ls(pathbuf);
-  printf("note: all directories beginning with '.' passed over to avoid infinite recursion\n");
+
+  out += fsize(pathbuf);
+  printf("GRAND TOTAL: %ld BYTES\n",out);
+}
+
+short should_ignore_path(char *name) {
+  if(strcmp(name,".") == 0) return 1;
+  if(strcmp(name,"..") == 0) return 2;
+  return 0;
 }
 
 off_t ls(char *path) {
@@ -35,8 +44,13 @@ off_t ls(char *path) {
     switch(dirfile->d_type) {
     case DT_DIR:
       strcat(path,dirfile->d_name);
-      total += print_fstat(path);
-      if( dirfile -> d_name[0] != '.') total += ls(path);
+      short ignore = should_ignore_path( dirfile -> d_name );
+      if(ignore) {
+	print_fstat(path);
+      }else{
+	total += print_fstat(path);
+	total += ls(path);
+      }
       *(strrchr(path,'/')+1) = '\0';
       // printf("directory [%s]/\n",path);
       break;

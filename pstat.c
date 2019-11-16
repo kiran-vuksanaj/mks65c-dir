@@ -62,3 +62,15 @@ off_t print_fstat(char *filepath) {
   printf("%s %12ld B %.12s %s\n",mode,statbuf.st_size,time+4,filepath);
   return statbuf.st_size;
 }
+
+off_t fsize(char *filepath) {
+  // for a situation in which you want the size but you don't want to print all the other stat info
+  struct stat statbuf;
+  int status;
+  status = stat(filepath,&statbuf);
+  if(status < 0) {
+    printf("Error while getting size of file %s: [%d] - %s\n",filepath,errno,strerror(errno));
+    return 0;
+  }
+  return statbuf.st_size;
+}
