@@ -25,6 +25,26 @@ void smodef(char *buf, mode_t mode) {
   }
   buf[i] = '\0';
 }
+
+void sprint_humansize(char *buf,off_t size) {
+  // assumed that buf has min 6 bytes
+  char *abbreviations = " KMGT";
+  int scale_count = 0;
+  float size_f = size;
+  while(size_f > 1000 && scale_count < 5){
+    size_f /= 1024.0;
+    scale_count++;
+  }
+  if(scale_count == 0){
+    sprintf(buf,"%3ld B",size);
+  }else{
+    char floatbuf[9];
+    sprintf(floatbuf,"%f",size_f);
+    floatbuf[3] = '\0';
+    sprintf(buf,"%s%cB",floatbuf,abbreviations[scale_count]);
+  }
+}
+
 off_t print_fstat(char *filepath) {
   struct stat statbuf;
   int status;
@@ -35,6 +55,8 @@ off_t print_fstat(char *filepath) {
   }
   char mode[10];
   smodef(mode,statbuf.st_mode);
-  printf("%s [%s] %ld B\t%s",mode,filepath,statbuf.st_size,ctime(&statbuf.st_atim.tv_sec));
+  char size[6];
+  sprint_humansize(size,statbuf.st_size);
+  printf("%s [%s] %s\t%s",mode,filepath,size,ctime(&statbuf.st_atim.tv_sec));
   return statbuf.st_size;
 }
