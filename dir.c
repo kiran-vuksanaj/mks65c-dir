@@ -14,7 +14,7 @@ off_t ls(char *path);
 int main() {
   char pathbuf[512] = ".";
   off_t out = ls(pathbuf);
-  printf("*: directory passed over to prevent infinite recursion\n");
+  printf("note: all directories beginning with '.' passed over to avoid infinite recursion\n");
 }
 
 off_t ls(char *path) {
@@ -22,7 +22,7 @@ off_t ls(char *path) {
   DIR *cwd = opendir(path);
   off_t total = 0;
   strcat(path,"/");
-  printf("directory %s\n",path);
+  // printf("directory %s\n",path);
   if(!cwd) {
     printf("Error while opening [%s]: [%d] - %s\n",path,errno,strerror(errno));
     return -1;
@@ -34,14 +34,11 @@ off_t ls(char *path) {
     // printf("file of type %hhd\n",dirfile->d_type);
     switch(dirfile->d_type) {
     case DT_DIR:
+      strcat(path,dirfile->d_name);
+      total += print_fstat(path);
+      if( dirfile -> d_name[0] != '.') total += ls(path);
+      *(strrchr(path,'/')+1) = '\0';
       // printf("directory [%s]/\n",path);
-      if(dirfile->d_name[0] != '.'){
-	strcat(path,dirfile->d_name);
-	total += ls(path);
-	*(strrchr(path,'/')+1) = '\0';
-      }else {
-	printf("<dir>     %12c %s%s *</dir>\n",' ',path,dirfile->d_name);
-      }
       break;
     case DT_REG:
       strcat(path,dirfile->d_name);
@@ -56,7 +53,7 @@ off_t ls(char *path) {
   }
   // char size_h[15] = "";
   // sprint_humansize(size_h,total);
-  printf("</dir>    %12ld B %s\n",total,path);
+  printf("total size: %12ld B %s\n\n",total,path);
   *(strrchr(path,'/')) = '\0';
   // closedir(cwd);
   return total;
