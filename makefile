@@ -1,6 +1,8 @@
 CC = gcc
 ifeq ($(DEBUG),true)
 	CFLAGS = -g
+else
+	CFLAGS = 
 endif
 
 all: dir.o pstat.o

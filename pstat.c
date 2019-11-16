@@ -55,10 +55,10 @@ off_t print_fstat(char *filepath) {
   }
   char mode[10];
   smodef(mode,statbuf.st_mode);
-  char size[6];
-  sprint_humansize(size,statbuf.st_size);
+  // char size[6];
+  // sprint_humansize(size,statbuf.st_size);
   char time[26];
   ctime_r(&statbuf.st_atim.tv_sec,time);
-  printf("%s %s %.12s %s\n",mode,size,time+4,filepath);
+  printf("%s %12ld B %.12s %s\n",mode,statbuf.st_size,time+4,filepath);
   return statbuf.st_size;
 }

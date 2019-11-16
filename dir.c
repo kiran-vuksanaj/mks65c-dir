@@ -14,6 +14,7 @@ off_t ls(char *path);
 int main() {
   char pathbuf[512] = ".";
   off_t out = ls(pathbuf);
+  printf("*: directory passed over to prevent infinite recursion\n");
 }
 
 off_t ls(char *path) {
@@ -39,7 +40,7 @@ off_t ls(char *path) {
 	total += ls(path);
 	*(strrchr(path,'/')+1) = '\0';
       }else {
-	printf("directory %s%s *\n",path,dirfile->d_name);
+	printf("<dir>     %12c %s%s *</dir>\n",' ',path,dirfile->d_name);
       }
       break;
     case DT_REG:
@@ -53,10 +54,10 @@ off_t ls(char *path) {
     }
     dirfile = readdir(cwd);
   }
-  char size_h[6];
-  sprint_humansize(size_h,total);
-  printf("dir total %s: %s\n",path,size_h);
+  // char size_h[15] = "";
+  // sprint_humansize(size_h,total);
+  printf("</dir>    %12ld B %s\n",total,path);
   *(strrchr(path,'/')) = '\0';
-  closedir(cwd);
+  // closedir(cwd);
   return total;
 }
