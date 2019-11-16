@@ -40,8 +40,8 @@ void sprint_humansize(char *buf,off_t size) {
   }else{
     char floatbuf[9];
     sprintf(floatbuf,"%f",size_f);
-    floatbuf[3] = '\0';
-    sprintf(buf,"%s%cB",floatbuf,abbreviations[scale_count]);
+    if(floatbuf[2]=='.') floatbuf[2] = ' ';
+    sprintf(buf,"%.3s%cB",floatbuf,abbreviations[scale_count]);
   }
 }
 
@@ -57,6 +57,8 @@ off_t print_fstat(char *filepath) {
   smodef(mode,statbuf.st_mode);
   char size[6];
   sprint_humansize(size,statbuf.st_size);
-  printf("%s [%s] %s\t%s",mode,filepath,size,ctime(&statbuf.st_atim.tv_sec));
+  char time[26];
+  ctime_r(&statbuf.st_atim.tv_sec,time);
+  printf("%s %s %.12s %s\n",mode,size,time+4,filepath);
   return statbuf.st_size;
 }

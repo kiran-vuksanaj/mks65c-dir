@@ -21,7 +21,7 @@ off_t ls(char *path) {
   DIR *cwd = opendir(path);
   off_t total = 0;
   strcat(path,"/");
-  printf("directory [%s]\n",path);
+  printf("directory %s\n",path);
   if(!cwd) {
     printf("Error while opening [%s]: [%d] - %s\n",path,errno,strerror(errno));
     return -1;
@@ -39,7 +39,7 @@ off_t ls(char *path) {
 	total += ls(path);
 	*(strrchr(path,'/')+1) = '\0';
       }else {
-	printf("directory [%s%s] (ignored for recursion)\n",path,dirfile->d_name);
+	printf("directory %s%s *\n",path,dirfile->d_name);
       }
       break;
     case DT_REG:
@@ -53,7 +53,10 @@ off_t ls(char *path) {
     }
     dirfile = readdir(cwd);
   }
-  printf("dir total [%s]: %ld B\n",path,total);
+  char size_h[6];
+  sprint_humansize(size_h,total);
+  printf("dir total %s: %s\n",path,size_h);
   *(strrchr(path,'/')) = '\0';
+  closedir(cwd);
   return total;
 }
