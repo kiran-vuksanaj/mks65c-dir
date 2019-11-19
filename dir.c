@@ -45,11 +45,12 @@ off_t ls(char *path) {
   strcat(path,"/");
   // printf("directory %s\n",path);
   if(!cwd) {
-    printf("Error while opening [%s]: [%d] - %s\n",path,errno,strerror(errno));
+    printf("Error while opening directory [%s]: [%d] - %s\n",path,errno,strerror(errno));
     return -1;
   }
   // printf("const DT_DIR: %hhd\n",DT_DIR);
   // printf("const DT_REG: %hhd\n",DT_REG);
+  off_t errcheck_tmp; // whenever smth is gonna get added to a total, put it here first and check whether it's negative 1!
   struct dirent *dirfile = readdir(cwd);
   while(dirfile) {
     // printf("file of type %hhd\n",dirfile->d_type);
@@ -60,14 +61,20 @@ off_t ls(char *path) {
       if(ignore) {
 	print_fstat(path);
       }else{
-	total += print_fstat(path);
-	total += ls(path);
+	errcheck_tmp = print_fstat(path);
+	if(errcheck_tmp < 0) return -1;
+	total += errcheck_tmp;
+	errcheck_tmp = ls(path);
+	if(errcheck_tmp < 0) return -1;
+	total += errcheck_tmp;
       }
       *(strrchr(path,'/')+1) = '\0';
       // printf("directory [%s]/\n",path);
       break;
     case DT_REG:
       strcat(path,dirfile->d_name);
+      errcheck_tmp = print_fstat(path);
+      if(errcheck_tmp < 0) return -1;
       total += print_fstat(path);
       *(strrchr(path,'/')+1) = '\0';
       break;
