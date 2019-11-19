@@ -12,12 +12,24 @@ off_t ls(char *path);
 short should_ignore_path(char *name);
 // NOTE: i'm assuming that path points to an allocation that has! enough! space! for all pathnames
 
-int main() {
-  char pathbuf[512] = ".";
+int main(int argc, char *argv[]) {
+  char pathbuf[512];
+  if(argc > 1){
+    strcpy(pathbuf,argv[1]);
+  }else{
+    printf("Please enter a directory name: ");
+    fgets(pathbuf,256,stdin);
+    *(strchr(pathbuf,'\n')) = '\0'; // cut off newline character from the input
+  }
+  
   off_t out = ls(pathbuf);
-
-  out += fsize(pathbuf);
-  printf("GRAND TOTAL: %ld BYTES\n",out);
+  if(out < 0){
+    printf("proper usage: ./elless [<dirname>]\n");
+    return 1;
+  }else{
+    out += fsize(pathbuf);
+    printf("GRAND TOTAL: %ld BYTES\n",out);
+  }
 }
 
 short should_ignore_path(char *name) {
