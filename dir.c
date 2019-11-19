@@ -88,6 +88,6 @@ off_t ls(char *path) {
   // sprint_humansize(size_h,total);
   printf("total size: %12ld B %s\n\n",total,path);
   *(strrchr(path,'/')) = '\0';
-  // closedir(cwd);
+  closedir(cwd);
   return total;
 }
